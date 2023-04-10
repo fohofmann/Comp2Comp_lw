@@ -47,49 +47,6 @@ class SpineSegmentation(InferenceClass):
         inference_pipeline.medical_volume = mv
         return {}
 
-    def setup_nnunet_c2c(self, model_dir: Union[str, Path]):
-        """Adapted from TotalSegmentator."""
-
-        model_dir = Path(model_dir)
-        config_dir = model_dir / Path("." + self.model_name)
-        (config_dir / "nnunet/results/nnUNet/3d_fullres").mkdir(exist_ok=True, parents=True)
-        (config_dir / "nnunet/results/nnUNet/2d").mkdir(exist_ok=True, parents=True)
-        weights_dir = config_dir / "nnunet/results"
-        self.weights_dir = weights_dir
-
-        os.environ["nnUNet_raw_data_base"] = str(
-            weights_dir
-        )  # not needed, just needs to be an existing directory
-        os.environ["nnUNet_preprocessed"] = str(
-            weights_dir
-        )  # not needed, just needs to be an existing directory
-        os.environ["RESULTS_FOLDER"] = str(weights_dir)
-
-    def download_spine_model(self, model_dir: Union[str, Path]):
-        download_dir = Path(
-            os.path.join(
-                self.weights_dir,
-                "nnUNet/3d_fullres/Task252_Spine/nnUNetTrainerV2_ep4000_nomirror__nnUNetPlansv2.1",
-            )
-        )
-        fold_0_path = download_dir / "fold_0"
-        if not os.path.exists(fold_0_path):
-            download_dir.mkdir(parents=True, exist_ok=True)
-            wget.download(
-                "https://huggingface.co/louisblankemeier/spine_v1/resolve/main/fold_0.zip",
-                out=os.path.join(download_dir, "fold_0.zip"),
-            )
-            with zipfile.ZipFile(os.path.join(download_dir, "fold_0.zip"), "r") as zip_ref:
-                zip_ref.extractall(download_dir)
-            os.remove(os.path.join(download_dir, "fold_0.zip"))
-            wget.download(
-                "https://huggingface.co/louisblankemeier/spine_v1/resolve/main/plans.pkl",
-                out=os.path.join(download_dir, "plans.pkl"),
-            )
-            print("Spine model downloaded.")
-        else:
-            print("Spine model already downloaded.")
-
     def spine_seg(self, input_path: Union[str, Path], output_path: Union[str, Path], model_dir):
         """Run spine segmentation.
 
@@ -112,9 +69,6 @@ class SpineSegmentation(InferenceClass):
         if self.model_name == "ts_spine":
             setup_nnunet()
             download_pretrained_weights(task_id[0])
-        elif self.model_name == "stanford_spine_v0.0.1":
-            self.setup_nnunet_c2c(model_dir)
-            self.download_spine_model(model_dir)
         else:
             raise ValueError("Invalid model name.")
 
@@ -147,12 +101,6 @@ class SpineSegmentation(InferenceClass):
 
         # Log total time for spine segmentation
         print(f"Total time for spine segmentation: {end-st:.2f}s.")
-
-        if self.model_name == "stanford_spine_v0.0.1":
-            seg_data = seg.get_fdata()
-            # subtract 17 from seg values except for 0
-            seg_data = np.where(seg_data == 0, 0, seg_data - 17)
-            seg = nib.Nifti1Image(seg_data, seg.affine, seg.header)
 
         return seg, img
 
@@ -387,7 +335,7 @@ class SpineMuscleAdiposeTissueReport(InferenceClass):
         new_im.paste(im_cor, (8, 8))
         im_sag.thumbnail((im_cor_width, 512))
         new_im.paste(im_sag, (8, 528))
-        new_im.save(os.path.join(image_dir, "report.png"))
+        new_im.save(os.path.join(image_dir, "report_bc.png"))
         im_cor.close()
         im_sag.close()
         new_im.close()
