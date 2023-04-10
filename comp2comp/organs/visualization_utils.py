@@ -283,7 +283,7 @@ def generate_liver_spleen_pancreas_report(root, organ_names):
 
         total_width += a_width
 
-    result.save(os.path.join(root, "report.png"))
+    result.save(os.path.join(root, "report_organs.png"))
 
 
 class_map_part_organs = {
