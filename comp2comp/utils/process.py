@@ -13,14 +13,14 @@ def process_2d(args, pipeline_builder):
     output_dir = Path(
         os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "../../outputs",
+            "../../../outputs",
             datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
         )
     )
     if not os.path.exists(output_dir):
         output_dir.mkdir(parents=True)
 
-    model_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../models")
+    model_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../../models")
     if not os.path.exists(model_dir):
         os.mkdir(model_dir)
 
@@ -30,7 +30,7 @@ def process_2d(args, pipeline_builder):
 
 
 def process_3d(args, pipeline_builder):
-    model_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../models")
+    model_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../../models")
     if not os.path.exists(model_dir):
         os.mkdir(model_dir)
 
@@ -58,7 +58,7 @@ def process_3d(args, pipeline_builder):
             output_dir = Path(
                 os.path.join(
                     os.path.dirname(os.path.abspath(__file__)),
-                    "../../outputs",
+                    "../../../outputs",
                     date_time,
                     Path(os.path.basename(path)),
                 )

@@ -57,7 +57,7 @@ os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 
 # manual definition of TOTALSEG_WEIGHTS_PATH
 # reduces dependency on adapted version 
-os.environ["TOTALSEG_WEIGHTS_PATH"] = "../comp2comp/totalsegmentator_weights/"
+os.environ["TOTALSEG_WEIGHTS_PATH"] = "models/"
 
 def MuscleAdiposeTissuePipelineBuilder(args):
     pipeline = InferencePipeline([
