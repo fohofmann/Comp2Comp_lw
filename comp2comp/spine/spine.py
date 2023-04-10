@@ -173,12 +173,6 @@ class AxialCropper(InferenceClass):
                 segmentation,
                 os.path.join(inference_pipeline.output_dir, "segmentations", "spine.nii.gz"),
             )
-            nib.save(
-                medical_volume,
-                os.path.join(
-                    inference_pipeline.output_dir, "segmentations", "converted_dcm.nii.gz"
-                ),
-            )
         return {}
 
 
