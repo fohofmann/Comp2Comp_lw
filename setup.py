@@ -40,19 +40,19 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "pydicom",
-        "numpy",
+        #"numpy", # manual install @arm64
         "h5py",
         "tabulate",
         "tqdm",
         "silx",
         "yacs",
-        "pandas",
-        #"dosma",
+        #"pandas", # manual install @arm64
+        #"dosma", #not needed anymore, to many dependencies and writing rights
         "opencv-python",
         "huggingface_hub",
         "pycocotools",
         "wget",
-        "tensorflow=2.11.0",
+        #"tensorflow=2.11.0", # manual install @arm64
         "dcm2niix",
         "totalsegmentator @ git+https://github.com/wasserth/TotalSegmentator.git",
     ],
@@ -72,6 +72,5 @@ setup(
             "recommonmark",
             "myst-parser",
         ],
-        "contrast_phase": ["xgboost"],
     },
 )
