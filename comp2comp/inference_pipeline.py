@@ -1,9 +1,7 @@
 import inspect
-import os
 from typing import Dict, List
 
 from comp2comp.inference_class_base import InferenceClass
-from comp2comp.io.io import DicomLoader, NiftiSaver
 
 
 class InferencePipeline(InferenceClass):

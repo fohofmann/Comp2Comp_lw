@@ -1,6 +1,5 @@
 import math
 import os
-import zipfile
 from pathlib import Path
 from time import time
 from typing import Union
@@ -8,13 +7,10 @@ from typing import Union
 import nibabel as nib
 import numpy as np
 import pandas as pd
-import wget
 from PIL import Image
-from totalsegmentator.libs import (
-    download_pretrained_weights,
-    nostdout,
-    setup_nnunet,
-)
+from totalsegmentator.libs import download_pretrained_weights
+from totalsegmentator.libs import nostdout
+from totalsegmentator.config import setup_nnunet
 
 from comp2comp.inference_class_base import InferenceClass
 from comp2comp.models.models import Models
@@ -39,12 +35,12 @@ class SpineSegmentation(InferenceClass):
         self.model_dir = inference_pipeline.model_dir
 
         seg = self.spine_seg(
-            inference_pipeline.medical_volume,
+            inference_pipeline.path_nifti,
             self.output_dir_segmentations + "spine.nii.gz",
             inference_pipeline.model_dir,
         )
         inference_pipeline.segmentation = seg
-        
+
         return {}
 
     def spine_seg(self, input_path: Union[str, Path], output_path: Union[str, Path], model_dir):

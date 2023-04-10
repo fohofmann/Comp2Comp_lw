@@ -1,5 +1,9 @@
+import os
+import subprocess
 from pathlib import Path
 from typing import Dict, Union
+
+import nibabel as nib
 
 from comp2comp.inference_class_base import InferenceClass
 
@@ -33,7 +37,6 @@ class DicomToNifti(InferenceClass):
     def __init__(self, input_path):
         super().__init__()
         self.input_dir = Path(input_path)
-        self.output_dir = inference_pipeline.output_dir
 
     def __call__(self, inference_pipeline):
         """Transform dicom files directory to nifti file in outputs.
@@ -44,14 +47,19 @@ class DicomToNifti(InferenceClass):
         Returns:
             medical volume to inference pipeline
         """
+        # define output directory
+        self.output_dir = inference_pipeline.output_dir
 
         # call dcm2niix directly, subprocess, verbose alwyas on
-        subprocess.call(f"dcm2niix -o {self.output_dir} -z y -f 'converted_dcm' {self.input_dir}", shell=True)
+        subprocess.call(
+            f"dcm2niix -o {self.output_dir} -z y -f 'converted_dcm' {self.input_dir}", shell=True
+        )
 
         # save "mv" to inference pipeline
-        inference_pipeline.medical_volume = nib.load(self.output_dir + "/converted_dcm.nii.gz")
+        inference_pipeline.medical_volume = nib.load(str(self.output_dir) + "/converted_dcm.nii.gz")
+        inference_pipeline.path_nifti = str(self.output_dir) + "/converted_dcm.nii.gz"
 
         # remove json file
-        os.remove(self.output_dir + "/converted_dcm.json")
-        
+        os.remove(str(self.output_dir) + "/converted_dcm.json")
+
         return {}

@@ -3,12 +3,9 @@ from pathlib import Path
 from time import time
 from typing import Union
 
-import numpy as np
-from totalsegmentator.libs import (
-    download_pretrained_weights,
-    nostdout,
-    setup_nnunet,
-)
+from totalsegmentator.libs import download_pretrained_weights
+from totalsegmentator.libs import nostdout
+from totalsegmentator.config import setup_nnunet
 
 from comp2comp.inference_class_base import InferenceClass
 
@@ -30,14 +27,13 @@ class OrganSegmentation(InferenceClass):
 
         self.model_dir = inference_pipeline.model_dir
 
-        mv, seg = self.organ_seg(
-            self.input_path,
+        seg = self.organ_seg(
+            inference_pipeline.path_nifti,
             self.output_dir_segmentations + "organs.nii.gz",
             inference_pipeline.model_dir,
         )
 
         inference_pipeline.segmentation = seg
-        inference_pipeline.medical_volume = mv
 
         return {}
 
@@ -67,7 +63,7 @@ class OrganSegmentation(InferenceClass):
 
         with nostdout():
 
-            seg, mvs = nnUNet_predict_image(
+            seg = nnUNet_predict_image(
                 input_path,
                 output_path,
                 task_id,
@@ -93,4 +89,4 @@ class OrganSegmentation(InferenceClass):
         # Log total time for spine segmentation
         print(f"Total time for organ segmentation: {end-st:.2f}s.")
 
-        return seg, mvs
+        return seg
