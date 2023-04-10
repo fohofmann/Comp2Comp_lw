@@ -76,20 +76,6 @@ class InferencePipeline(InferenceClass):
 
 if __name__ == "__main__":
     """Example usage of InferencePipeline."""
-    import argparse
+    # getting rid of any dosma-dependecies
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dicom_dir", type=str, required=True)
-    args = parser.parse_args()
-
-    output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../outputs")
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
-    output_file_path = os.path.join(output_dir, "test.nii.gz")
-
-    pipeline = InferencePipeline(
-        [DicomLoader(args.dicom_dir), NiftiSaver()], config={"output_dir": output_file_path}
-    )
-    pipeline()
-
-    print("Done.")
+    print("You should import the inference pipeline as a module instead of running it as a script.")
