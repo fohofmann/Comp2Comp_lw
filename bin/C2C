@@ -8,6 +8,8 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 from time import time
+import subprocess
+import nibabel as nib
 
 import h5py
 import matplotlib.pyplot as plt
@@ -21,7 +23,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 from comp2comp.inference_pipeline import InferencePipeline
-from comp2comp.io.io import DicomFinder
+from comp2comp.io.io import (DicomFinder, DicomToNifti)
 from comp2comp.io.io_utils import get_dicom_paths_and_num
 from comp2comp.models.models import Models
 from comp2comp.muscle_adipose_tissue.muscle_adipose_tissue import (
@@ -79,6 +81,7 @@ def MuscleAdiposeTissueFullPipelineBuilder(args):
 
 def SpinePipelineBuilder(path, args):
     pipeline = InferencePipeline([
+        DicomToNifti(path),
         SpineSegmentation(path, args.spine_model),
         SpineToCanonical(),
         SpineComputeROIs(args.spine_model),

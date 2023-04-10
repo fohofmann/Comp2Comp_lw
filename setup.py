@@ -43,6 +43,8 @@ setup(
         #"numpy", # manual install @arm64
         "h5py",
         "tabulate",
+        "subprocess", # new
+        "nibabel", # new
         "tqdm",
         "silx",
         "yacs",

@@ -38,13 +38,13 @@ class SpineSegmentation(InferenceClass):
 
         self.model_dir = inference_pipeline.model_dir
 
-        seg, mv = self.spine_seg(
-            self.input_path,
+        seg = self.spine_seg(
+            inference_pipeline.medical_volume,
             self.output_dir_segmentations + "spine.nii.gz",
             inference_pipeline.model_dir,
         )
         inference_pipeline.segmentation = seg
-        inference_pipeline.medical_volume = mv
+        
         return {}
 
     def spine_seg(self, input_path: Union[str, Path], output_path: Union[str, Path], model_dir):
@@ -76,7 +76,7 @@ class SpineSegmentation(InferenceClass):
 
         with nostdout():
 
-            img, seg = nnUNet_predict_image(
+            seg = nnUNet_predict_image(
                 input_path,
                 output_path,
                 task_id,
@@ -102,7 +102,7 @@ class SpineSegmentation(InferenceClass):
         # Log total time for spine segmentation
         print(f"Total time for spine segmentation: {end-st:.2f}s.")
 
-        return seg, img
+        return seg
 
 
 class SpineToCanonical(InferenceClass):
