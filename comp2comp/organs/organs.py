@@ -13,31 +13,26 @@ from comp2comp.inference_class_base import InferenceClass
 class OrganSegmentation(InferenceClass):
     """Organ segmentation."""
 
-    def __init__(self, input_path, model_name="ts_spine"):
+    def __init__(self, input_path):
         super().__init__()
         self.input_path = input_path
-        self.model_name = model_name
 
     def __call__(self, inference_pipeline):
-        inference_pipeline.dicom_series_path = self.input_path
         self.output_dir = inference_pipeline.output_dir
         self.output_dir_segmentations = os.path.join(self.output_dir, "segmentations/")
         if not os.path.exists(self.output_dir_segmentations):
             os.makedirs(self.output_dir_segmentations)
 
-        self.model_dir = inference_pipeline.model_dir
-
         seg = self.organ_seg(
             inference_pipeline.path_nifti,
-            self.output_dir_segmentations + "organs.nii.gz",
-            inference_pipeline.model_dir,
+            self.output_dir_segmentations + "organs.nii.gz"
         )
 
         inference_pipeline.segmentation = seg
 
         return {}
 
-    def organ_seg(self, input_path: Union[str, Path], output_path: Union[str, Path], model_dir):
+    def organ_seg(self, input_path: Union[str, Path], output_path: Union[str, Path]):
         """Run organ segmentation.
 
         Args:
@@ -47,7 +42,6 @@ class OrganSegmentation(InferenceClass):
 
         print("Segmenting organs...")
         st = time()
-        os.environ["SCRATCH"] = self.model_dir
 
         # Setup nnunet
         model = "3d_fullres"

@@ -20,30 +20,26 @@ from comp2comp.spine import spine_utils
 class SpineSegmentation(InferenceClass):
     """Spine segmentation."""
 
-    def __init__(self, input_path, model_name):
+    def __init__(self, input_path):
         super().__init__()
         self.input_path = input_path
-        self.model_name = model_name
 
     def __call__(self, inference_pipeline):
-        inference_pipeline.dicom_series_path = self.input_path
         self.output_dir = inference_pipeline.output_dir
         self.output_dir_segmentations = os.path.join(self.output_dir, "segmentations/")
         if not os.path.exists(self.output_dir_segmentations):
             os.makedirs(self.output_dir_segmentations)
 
-        self.model_dir = inference_pipeline.model_dir
-
         seg = self.spine_seg(
             inference_pipeline.path_nifti,
-            self.output_dir_segmentations + "spine.nii.gz",
-            inference_pipeline.model_dir,
+            self.output_dir_segmentations + "spine.nii.gz"
         )
+
         inference_pipeline.segmentation = seg
 
         return {}
 
-    def spine_seg(self, input_path: Union[str, Path], output_path: Union[str, Path], model_dir):
+    def spine_seg(self, input_path: Union[str, Path], output_path: Union[str, Path]):
         """Run spine segmentation.
 
         Args:
@@ -53,7 +49,6 @@ class SpineSegmentation(InferenceClass):
 
         print("Segmenting spine...")
         st = time()
-        os.environ["SCRATCH"] = self.model_dir
 
         # Setup nnunet
         model = "3d_fullres"
@@ -62,11 +57,8 @@ class SpineSegmentation(InferenceClass):
         crop_path = None
         task_id = [252]
 
-        if self.model_name == "ts_spine":
-            setup_nnunet()
-            download_pretrained_weights(task_id[0])
-        else:
-            raise ValueError("Invalid model name.")
+        setup_nnunet()
+        download_pretrained_weights(task_id[0])
 
         from totalsegmentator.nnunet import nnUNet_predict_image
 
@@ -291,6 +283,7 @@ class SpineMuscleAdiposeTissueReport(InferenceClass):
     def __call__(self, inference_pipeline):
         image_dir = Path(inference_pipeline.output_dir) / "images"
         self.generate_panel(image_dir)
+        return {}
 
     def generate_panel(self, image_dir: Union[str, Path]):
         """Generate panel.

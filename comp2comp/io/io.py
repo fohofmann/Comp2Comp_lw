@@ -36,7 +36,8 @@ class DicomToNifti(InferenceClass):
 
     def __init__(self, input_path):
         super().__init__()
-        self.input_dir = Path(input_path)
+        self.input_dir = input_path
+        #self.input_dir = Path(input_path)
 
     def __call__(self, inference_pipeline):
         """Transform dicom files directory to nifti file in outputs.
@@ -48,8 +49,9 @@ class DicomToNifti(InferenceClass):
             medical volume to inference pipeline
         """
         # define output directory
+        inference_pipeline.dicom_series_path = str(self.input_dir)
         self.output_dir = inference_pipeline.output_dir
-
+        
         # call dcm2niix directly, subprocess, verbose alwyas on
         subprocess.call(
             f"dcm2niix -o {self.output_dir} -z y -f 'converted_dcm' {self.input_dir}", shell=True

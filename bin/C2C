@@ -82,7 +82,7 @@ def MuscleAdiposeTissueFullPipelineBuilder(args):
 def SpinePipelineBuilder(path, args):
     pipeline = InferencePipeline([
         DicomToNifti(path),
-        SpineSegmentation(path, args.spine_model),
+        SpineSegmentation(path),
         SpineToCanonical(),
         SpineComputeROIs(args.spine_model),
         SpineMetricsSaver(),
