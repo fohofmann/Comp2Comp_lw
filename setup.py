@@ -40,16 +40,15 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "pydicom",
-        # "numpy", # manual install @arm64
+        "numpy",
         "h5py",
         "tabulate",
-        "nibabel",  # new
-        "matplotlib",  # new
+        "nibabel",
+        "matplotlib",
         "tqdm",
         "silx",
         "yacs",
-        # "pandas", # manual install @arm64
-        # "dosma", #not needed anymore, to many dependencies and writing rights
+        "pandas",
         "opencv-python",
         "huggingface_hub",
         "pycocotools",
