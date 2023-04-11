@@ -20,9 +20,8 @@ from comp2comp.spine import spine_utils
 class SpineSegmentation(InferenceClass):
     """Spine segmentation."""
 
-    def __init__(self, input_path):
+    def __init__(self):
         super().__init__()
-        self.input_path = input_path
 
     def __call__(self, inference_pipeline):
         self.output_dir = inference_pipeline.output_dir
@@ -169,9 +168,9 @@ class AxialCropper(InferenceClass):
 
 
 class SpineComputeROIs(InferenceClass):
-    def __init__(self, spine_model):
+    def __init__(self):
         super().__init__()
-        self.spine_model_name = spine_model
+        self.spine_model_name = "ts_spine"
         self.spine_model_type = Models.model_from_name(self.spine_model_name)
 
     def __call__(self, inference_pipeline):

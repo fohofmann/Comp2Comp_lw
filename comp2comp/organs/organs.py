@@ -13,9 +13,8 @@ from comp2comp.inference_class_base import InferenceClass
 class OrganSegmentation(InferenceClass):
     """Organ segmentation."""
 
-    def __init__(self, input_path):
+    def __init__(self):
         super().__init__()
-        self.input_path = input_path
 
     def __call__(self, inference_pipeline):
         self.output_dir = inference_pipeline.output_dir

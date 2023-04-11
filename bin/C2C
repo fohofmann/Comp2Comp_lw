@@ -81,7 +81,7 @@ def MuscleAdiposeTissueFullPipelineBuilder(args):
 
 def SpinePipelineBuilder(path, args):
     pipeline = InferencePipeline([
-        DicomToNifti(path),
+        #DicomToNifti(path),
         SpineSegmentation(path),
         SpineToCanonical(),
         SpineComputeROIs(args.spine_model),
@@ -110,8 +110,41 @@ def SpineMuscleAdiposeTissuePipelineBuilder(path, args):
     )
     return pipeline
 
+#def CombinedPipelineBuilder(path, args):
+#    pipeline = InferencePipeline([
+#        DicomToNifti(path),
+#        SpineMuscleAdiposeTissuePipelineBuilder(path, args),
+#       LiverSpleenPancreasPipelineBuilder(path, args)
+#        ]
+#    )
+#    return pipeline
+
+def CombinedPipelineBuilder(path, args):
+    pipeline = InferencePipeline([
+        DicomToNifti(path),
+        OrganSegmentation(),
+        LiverSpleenPancreasVisualizer(),
+        LiverSpleenPancreasMetricsPrinter(),
+        SpineSegmentation(),
+        SpineToCanonical(),
+        SpineComputeROIs(),
+        SpineMetricsSaver(),
+        SpineCoronalSagittalVisualizer(),
+        SpineFindDicoms(),
+        MuscleAdiposeTissueSegmentation(),
+        MuscleAdiposeTissuePostProcessing(),
+        MuscleAdiposeTissueComputeMetrics(),
+        MuscleAdiposeTissueVisualizer(),
+        MuscleAdiposeTissueH5Saver(),
+        MuscleAdiposeTissueMetricsSaver(),
+        SpineMuscleAdiposeTissueReport()
+        ]
+    )
+    return pipeline
+
 def LiverSpleenPancreasPipelineBuilder(path, args):
     pipeline = InferencePipeline([
+        #DicomToNifti(path),
         OrganSegmentation(path),
         LiverSpleenPancreasVisualizer(),
         LiverSpleenPancreasMetricsPrinter()
@@ -175,6 +208,28 @@ def argument_parser():
         type=str,
         help="spine model to use for inference",
     )
+
+    # Spine + muscle + fat
+    combined_parser = subparsers.add_parser("combined",
+                                            help="body composition and organs")
+    combined_parser.add_argument(
+        "--input_path",
+        required=True,
+        type=str,
+        help="path to input directory or file",
+    )
+    combined_parser.add_argument(
+        "--muscle_fat_model",
+        default="abCT_v0.0.1",
+        type=str,
+        help="muscle + fat segmentation model to use for inference",
+    )
+    combined_parser.add_argument(
+        "--spine_model",
+        default="ts_spine",
+        type=str,
+        help="spine model to use for inference",
+    )
     
     # liver, spleen, pancreas
     liver_spleen_pancreas = subparsers.add_parser("liver_spleen_pancreas",
@@ -196,6 +251,8 @@ def main():
         process_3d(args, SpineMuscleAdiposeTissuePipelineBuilder)
     elif args.action == "spine":
         process_3d(args, SpinePipelineBuilder)
+    elif args.action == "combined":
+        process_3d(args, CombinedPipelineBuilder)
     elif args.action == "liver_spleen_pancreas":
         process_3d(args, LiverSpleenPancreasPipelineBuilder)
     else:

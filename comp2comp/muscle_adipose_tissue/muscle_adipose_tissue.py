@@ -18,8 +18,9 @@ from comp2comp.muscle_adipose_tissue.data import Dataset, predict
 class MuscleAdiposeTissueSegmentation(InferenceClass):
     """Muscle adipose tissue segmentation class."""
 
-    def __init__(self, batch_size: int, model_name: str, model_dir: str = None):
+    def __init__(self, batch_size: int = 16, model_name: str = "abCT_v0.0.1", model_dir: str = None):
         super().__init__()
+
         self.batch_size = batch_size
         self.model_name = model_name
         self.model_type = Models.model_from_name(model_name)
