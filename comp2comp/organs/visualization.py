@@ -55,6 +55,7 @@ class LiverSpleenPancreasVisualizer(InferenceClass):
 
         inference_pipeline.organ_metrics = self.organ_metrics
 
+        print("Save organ report to png")
         generate_liver_spleen_pancreas_report(self.output_dir_images_organs, self.organ_names)
 
         return {}
@@ -82,7 +83,7 @@ class LiverSpleenPancreasMetricsPrinter(InferenceClass):
 
         base_print = "{:<" + str(name_dist + 4) + "}" + ("{:<" + str(15) + ".0f}") * len(metrics)
 
-        print("\n")
+        print("Save organ measurements to csv:\n")
         print(header)
 
         for organ in results.values():

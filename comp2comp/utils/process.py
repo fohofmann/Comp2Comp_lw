@@ -8,27 +8,6 @@ from time import time
 
 from comp2comp.io.io_utils import get_dicom_paths_and_num
 
-
-def process_2d(args, pipeline_builder):
-    output_dir = Path(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            "../../../outputs",
-            datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
-        )
-    )
-    if not os.path.exists(output_dir):
-        output_dir.mkdir(parents=True)
-
-    model_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../../models")
-    if not os.path.exists(model_dir):
-        os.mkdir(model_dir)
-
-    pipeline = pipeline_builder(args)
-
-    pipeline(output_dir=output_dir, model_dir=model_dir)
-
-
 def process_3d(args, pipeline_builder):
     model_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../../models")
     if not os.path.exists(model_dir):

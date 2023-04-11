@@ -1,8 +1,6 @@
 import inspect
 from typing import Dict, List
-
 from comp2comp.inference_class_base import InferenceClass
-
 
 class InferencePipeline(InferenceClass):
     """Inference pipeline."""
@@ -18,8 +16,7 @@ class InferencePipeline(InferenceClass):
 
     def __call__(self, inference_pipeline=None, **kwargs):
         # print out the class names for each inference class
-        print("")
-        print("Inference pipeline:")
+        print("Planned inference pipeline:")
         for i, inference_class in enumerate(self.inference_classes):
             print(f"({i + 1}) {inference_class.__repr__()}")
         print("")
@@ -48,24 +45,14 @@ class InferencePipeline(InferenceClass):
                 inference_class.__repr__()
             )
 
-            print(
-                "Running {} with input keys {}".format(
-                    inference_class.__repr__(), inspect.signature(inference_class).parameters.keys()
-                )
-            )
+            print("\nRunning {}".format(inference_class.__repr__()))
 
             if inference_pipeline:
                 output = inference_class(inference_pipeline=inference_pipeline, **output)
             else:
                 output = inference_class(inference_pipeline=self, **output)
 
-            # if not the last inference class, check that the output keys are correct
-            if inference_class != self.inference_classes[-1]:
-                print(
-                    "Finished {} with output keys {}\n".format(
-                        inference_class.__repr__(), output.keys()
-                    )
-                )
+            print("Finished {}".format(inference_class.__repr__()))
 
         print("Inference pipeline finished.\n")
 
@@ -76,4 +63,4 @@ if __name__ == "__main__":
     """Example usage of InferencePipeline."""
     # getting rid of any dosma-dependecies
 
-    print("You should import the inference pipeline as a module instead of running it as a script.")
+    print("You should use the inference pipeline as a module instead of running it as a script.")

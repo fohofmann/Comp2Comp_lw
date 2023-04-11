@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from time import time
 from typing import Union
+import nibabel as nib
 
 from totalsegmentator.libs import download_pretrained_weights
 from totalsegmentator.libs import nostdout
@@ -17,8 +18,12 @@ class OrganSegmentation(InferenceClass):
         super().__init__()
 
     def __call__(self, inference_pipeline):
+
+        # define output directories, load medical volume from nifti
         self.output_dir = inference_pipeline.output_dir
         self.output_dir_segmentations = os.path.join(self.output_dir, "segmentations/")
+        inference_pipeline.medical_volume = nib.load(inference_pipeline.path_nifti)
+
         if not os.path.exists(self.output_dir_segmentations):
             os.makedirs(self.output_dir_segmentations)
 
@@ -39,7 +44,7 @@ class OrganSegmentation(InferenceClass):
             output_path (Union[str, Path]): Output path.
         """
 
-        print("Segmenting organs...")
+        print("Segmenting organs using nnUNet...")
         st = time()
 
         # Setup nnunet
@@ -50,7 +55,7 @@ class OrganSegmentation(InferenceClass):
         task_id = [251]
 
         setup_nnunet()
-        download_pretrained_weights(task_id[0])
+        #download_pretrained_weights(task_id[0])
 
         from totalsegmentator.nnunet import nnUNet_predict_image
 

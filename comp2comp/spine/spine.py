@@ -7,6 +7,7 @@ from typing import Union
 import nibabel as nib
 import numpy as np
 import pandas as pd
+import nibabel as nib
 from PIL import Image
 from totalsegmentator.libs import download_pretrained_weights
 from totalsegmentator.libs import nostdout
@@ -16,7 +17,6 @@ from comp2comp.inference_class_base import InferenceClass
 from comp2comp.models.models import Models
 from comp2comp.spine import spine_utils
 
-
 class SpineSegmentation(InferenceClass):
     """Spine segmentation."""
 
@@ -24,8 +24,12 @@ class SpineSegmentation(InferenceClass):
         super().__init__()
 
     def __call__(self, inference_pipeline):
+
+        # define output directories, load medical volume from nifti
         self.output_dir = inference_pipeline.output_dir
         self.output_dir_segmentations = os.path.join(self.output_dir, "segmentations/")
+        inference_pipeline.medical_volume = nib.load(inference_pipeline.path_nifti)
+
         if not os.path.exists(self.output_dir_segmentations):
             os.makedirs(self.output_dir_segmentations)
 

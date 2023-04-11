@@ -1,31 +1,30 @@
 #!/usr/bin/env python
 import argparse
-import logging
+#import logging
 import os
-import shutil
-import subprocess
-import sys
-import traceback
-from datetime import datetime
-from pathlib import Path
-from time import time
+#import shutil
+#import subprocess
+#import sys
+#import traceback
+#from datetime import datetime
+#from pathlib import Path
+#from time import time
 
-import h5py
-import matplotlib.pyplot as plt
-import nibabel as nib
-import numpy as np
-import pandas as pd
+#import h5py
+#import matplotlib.pyplot as plt
+#import nibabel as nib
+#import numpy as np
+#import pandas as pd
 
 # import voxel as vx
-from tqdm import tqdm
+#from tqdm import tqdm
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+os.environ["TOTALSEG_WEIGHTS_PATH"] = "models/"
 
 from comp2comp.inference_pipeline import InferencePipeline
-from comp2comp.io.io import DicomFinder, DicomToNifti
-from comp2comp.io.io_utils import get_dicom_paths_and_num
-from comp2comp.models.models import Models
+from comp2comp.io.io import DicomToNifti
 from comp2comp.muscle_adipose_tissue.muscle_adipose_tissue import (
     MuscleAdiposeTissueComputeMetrics,
     MuscleAdiposeTissueH5Saver,
@@ -42,7 +41,6 @@ from comp2comp.organs.visualization import (
     LiverSpleenPancreasVisualizer,
 )
 from comp2comp.spine.spine import (
-    AxialCropper,
     SpineComputeROIs,
     SpineCoronalSagittalVisualizer,
     SpineFindDicoms,
@@ -51,73 +49,9 @@ from comp2comp.spine.spine import (
     SpineSegmentation,
     SpineToCanonical,
 )
-from comp2comp.utils.process import process_2d, process_3d
+from comp2comp.utils.process import process_3d
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-
-# manual definition of TOTALSEG_WEIGHTS_PATH
-# reduces dependency on adapted version 
-os.environ["TOTALSEG_WEIGHTS_PATH"] = "models/"
-
-def MuscleAdiposeTissuePipelineBuilder(args):
-    pipeline = InferencePipeline([
-        MuscleAdiposeTissueSegmentation(16, args.muscle_fat_model),
-        MuscleAdiposeTissuePostProcessing(),
-        MuscleAdiposeTissueComputeMetrics(),
-        MuscleAdiposeTissueVisualizer(),
-        MuscleAdiposeTissueH5Saver(),
-        MuscleAdiposeTissueMetricsSaver()
-        ]
-    )
-    return pipeline
-
-def MuscleAdiposeTissueFullPipelineBuilder(args):
-    pipeline = InferencePipeline([
-        DicomFinder(args.input_path),
-        MuscleAdiposeTissuePipelineBuilder(args)
-        ]
-    )
-    return pipeline
-
-def SpinePipelineBuilder(path, args):
-    pipeline = InferencePipeline([
-        #DicomToNifti(path),
-        SpineSegmentation(path),
-        SpineToCanonical(),
-        SpineComputeROIs(args.spine_model),
-        SpineMetricsSaver(),
-        SpineCoronalSagittalVisualizer()
-        ]
-    )
-    return pipeline
-
-def AxialCropperPipelineBuilder(path, args):
-    pipeline = InferencePipeline([
-        SpineSegmentation(path, args.spine_model),
-        SpineToCanonical(),
-        AxialCropper(lower_level="L5", upper_level="L1", save=True)
-        ]
-    )
-    return pipeline
-
-def SpineMuscleAdiposeTissuePipelineBuilder(path, args):
-    pipeline = InferencePipeline([
-        SpinePipelineBuilder(path, args),
-        SpineFindDicoms(),
-        MuscleAdiposeTissuePipelineBuilder(args),
-        SpineMuscleAdiposeTissueReport()
-        ]
-    )
-    return pipeline
-
-#def CombinedPipelineBuilder(path, args):
-#    pipeline = InferencePipeline([
-#        DicomToNifti(path),
-#        SpineMuscleAdiposeTissuePipelineBuilder(path, args),
-#       LiverSpleenPancreasPipelineBuilder(path, args)
-#        ]
-#    )
-#    return pipeline
 
 def CombinedPipelineBuilder(path, args):
     pipeline = InferencePipeline([
@@ -142,99 +76,9 @@ def CombinedPipelineBuilder(path, args):
     )
     return pipeline
 
-def LiverSpleenPancreasPipelineBuilder(path, args):
-    pipeline = InferencePipeline([
-        #DicomToNifti(path),
-        OrganSegmentation(path),
-        LiverSpleenPancreasVisualizer(),
-        LiverSpleenPancreasMetricsPrinter()
-        ]
-    )
-    return pipeline
-
 def argument_parser():
     parser = argparse.ArgumentParser("Comp2Comp command line interface")
-    subparsers = parser.add_subparsers(dest="action")
-
-    # Muscle + fat 
-    muscle_adipose_tissue_parser = subparsers.add_parser("muscle_adipose_tissue", 
-                                              help="muscle + fat")
-    muscle_adipose_tissue_parser.add_argument(
-        "--input_path",
-        required=True,
-        type=str,
-        help="path to input directory or file",
-    )
-    muscle_adipose_tissue_parser.add_argument(
-        "--muscle_fat_model",
-        default = 'abCT_v0.0.1',
-        type=str,
-        help="muscle + fat segmentation model to use for inference",
-    )
-
-    # Spine
-    spine_parser = subparsers.add_parser("spine", help="spine")
-    spine_parser.add_argument(
-        "--input_path",
-        required=True,
-        type=str,
-        help="path to input directory or file",
-    )
-    spine_parser.add_argument(
-        "--spine_model",
-        default="ts_spine",
-        type=str,
-        help="spine model to use for inference",
-    )
-
-    # Spine + muscle + fat
-    spine_muscle_adipose_tissue_parser = subparsers.add_parser("spine_muscle_adipose_tissue",
-                                              help="spine + muscle + fat")
-    spine_muscle_adipose_tissue_parser.add_argument(
-        "--input_path",
-        required=True,
-        type=str,
-        help="path to input directory or file",
-    )
-    spine_muscle_adipose_tissue_parser.add_argument(
-        "--muscle_fat_model",
-        default="abCT_v0.0.1",
-        type=str,
-        help="muscle + fat segmentation model to use for inference",
-    )
-    spine_muscle_adipose_tissue_parser.add_argument(
-        "--spine_model",
-        default="ts_spine",
-        type=str,
-        help="spine model to use for inference",
-    )
-
-    # Spine + muscle + fat
-    combined_parser = subparsers.add_parser("combined",
-                                            help="body composition and organs")
-    combined_parser.add_argument(
-        "--input_path",
-        required=True,
-        type=str,
-        help="path to input directory or file",
-    )
-    combined_parser.add_argument(
-        "--muscle_fat_model",
-        default="abCT_v0.0.1",
-        type=str,
-        help="muscle + fat segmentation model to use for inference",
-    )
-    combined_parser.add_argument(
-        "--spine_model",
-        default="ts_spine",
-        type=str,
-        help="spine model to use for inference",
-    )
-    
-    # liver, spleen, pancreas
-    liver_spleen_pancreas = subparsers.add_parser("liver_spleen_pancreas",
-                                              help="Segmentation of liver, spleen and pancreas")
-    liver_spleen_pancreas.add_argument(
+    parser.add_argument(
         "--input_path",
         required=True,
         type=str,
@@ -242,24 +86,8 @@ def argument_parser():
     )
     return parser
 
-
-def main():
-    args = argument_parser().parse_args()
-    if args.action == "muscle_adipose_tissue":
-        process_2d(args, MuscleAdiposeTissueFullPipelineBuilder)
-    elif args.action == "spine_muscle_adipose_tissue":
-        process_3d(args, SpineMuscleAdiposeTissuePipelineBuilder)
-    elif args.action == "spine":
-        process_3d(args, SpinePipelineBuilder)
-    elif args.action == "combined":
-        process_3d(args, CombinedPipelineBuilder)
-    elif args.action == "liver_spleen_pancreas":
-        process_3d(args, LiverSpleenPancreasPipelineBuilder)
-    else:
-        raise AssertionError("{} command not supported".format(args.action))
-
-
 if __name__ == "__main__":
-    main()
-
+    print("\nModified, lighweight version of Comp2Comp. Only predefined pipeline.")
+    args = argument_parser().parse_args()
+    process_3d(args, CombinedPipelineBuilder)
 
