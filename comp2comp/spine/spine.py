@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import nibabel as nib
 from PIL import Image
-from totalsegmentator.libs import download_pretrained_weights
+#from totalsegmentator.libs import download_pretrained_weights
 from totalsegmentator.libs import nostdout
 from totalsegmentator.config import setup_nnunet
 
@@ -61,7 +61,7 @@ class SpineSegmentation(InferenceClass):
         task_id = [252]
 
         setup_nnunet()
-        download_pretrained_weights(task_id[0])
+        #download_pretrained_weights(task_id[0])
 
         from totalsegmentator.nnunet import nnUNet_predict_image
 

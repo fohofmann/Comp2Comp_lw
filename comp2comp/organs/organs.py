@@ -4,7 +4,7 @@ from time import time
 from typing import Union
 import nibabel as nib
 
-from totalsegmentator.libs import download_pretrained_weights
+#from totalsegmentator.libs import download_pretrained_weights
 from totalsegmentator.libs import nostdout
 from totalsegmentator.config import setup_nnunet
 

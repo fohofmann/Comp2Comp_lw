@@ -7,10 +7,11 @@
 **This is a fork of the [Comp2Comp](https://github.com/StanfordMIMI/Comp2Comp/) repository. Please refer to the original repository for more information.**
 
 ## General information
-This fork is a lightweight version of the original [Comp2Com repository](https://github.com/StanfordMIMI/Comp2Comp/).
+This fork is a lightweight version of the original [Comp2Comp repository](https://github.com/StanfordMIMI/Comp2Comp/).
 Some quick and dirty adaptions were made to reduce dependencies, complexity and required writing rights on the host system, making the implementation at HPC-systems simpler.
 - predefined pipeline, reduced arguments
 - reduction of dependencies (e.g. dosma)
+- reduced output
 - usage of the original TotalSegmentator instead of the forked Standford version
 - download and integration of weights and models prior to execution
 - paths moved to parent directory
