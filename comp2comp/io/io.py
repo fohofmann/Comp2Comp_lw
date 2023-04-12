@@ -27,8 +27,12 @@ class DicomToNifti(InferenceClass):
         # save series name
         inference_pipeline.dicom_series_name = str(self.input_dir).split("/")[-1]
         
-        # select first file in input directory, read dicoms, save date
-        file = os.listdir(self.input_dir)[0]
+        # select first, not hidden file in input directory
+        for file in os.listdir(self.input_dir):
+            if not file.startswith(".") and file.endswith(".dcm"):
+                break
+        
+        # read dicoms, save date
         dcmData = pydicom.filereader.dcmread(str(self.input_dir) + "/" + file)
         inference_pipeline.dicom_series_date = dcmData.StudyDate
 
