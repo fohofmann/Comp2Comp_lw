@@ -98,14 +98,14 @@ class LiverSpleenPancreasMetricsPrinter(InferenceClass):
         if not os.path.exists(self.output_dir_metrics_organs):
             os.makedirs(self.output_dir_metrics_organs)
 
-        header = ",".join(["Organ"] + [m + "(" + u + ")" for m, u in zip(metrics, units)]) + "\n"
+        header = ",".join(["series_name","series_date","organ","volume","hu_mean","hu_median"]) + "\n"
         with open(
             os.path.join(self.output_dir_metrics_organs, "liver_spleen_pancreas_metrics.csv"), "w"
         ) as f:
             f.write(header)
 
             for organ in results.values():
-                line = ",".join([str(v) for v in organ.values()]) + "\n"
+                line = ",".join([inference_pipeline.dicom_series_name, inference_pipeline.dicom_series_date] + [str(v) for v in organ.values()]) + "\n"
                 f.write(line)
 
         return {}

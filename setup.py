@@ -45,7 +45,6 @@ setup(
         "tabulate",
         "nibabel",
         "matplotlib",
-        "tqdm",
         "silx",
         "yacs",
         "pandas",

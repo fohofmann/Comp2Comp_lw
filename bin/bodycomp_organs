@@ -70,7 +70,7 @@ def argument_parser():
     return parser
 
 if __name__ == "__main__":
-    print("\nModified, lighweight version of Comp2Comp. Only predefined pipeline.")
+    print("\nModified, lighweight version of Comp2Comp. Only predefined pipeline.\n")
     args = argument_parser().parse_args()
     process_3d(args, CombinedPipelineBuilder)
 

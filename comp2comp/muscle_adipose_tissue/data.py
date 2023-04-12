@@ -5,8 +5,6 @@ import keras.utils as k_utils
 import numpy as np
 import pydicom
 from keras.utils.data_utils import OrderedEnqueuer
-from tqdm import tqdm
-
 
 def parse_windows(windows):
     """Parse windows provided by the user.
@@ -196,7 +194,7 @@ def predict(
     xs = []
     ys = []
     params = []
-    for _ in tqdm(range(num_scans)):
+    for _ in range(num_scans):
         x, p_dicts = next(output_generator)
         y = model.predict(x, batch_size=batch_size)
 

@@ -20,7 +20,8 @@ def process_3d(args, pipeline_builder):
         try:
             st = time()
 
-            print("Processing: ", path, " with ", num, " slices")
+            print("------------------------------------------------------------")
+            print("--- Processing: ", path, " with ", num, " slices ---")
 
             min_slices = 30
             if num < min_slices:

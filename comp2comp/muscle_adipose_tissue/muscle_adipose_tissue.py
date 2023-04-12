@@ -7,7 +7,6 @@ import h5py
 import numpy as np
 import pandas as pd
 from keras import backend as K
-from tqdm import tqdm
 
 from comp2comp.inference_class_base import InferenceClass
 from comp2comp.metrics.metrics import CrossSectionalArea, HounsfieldUnits
@@ -137,7 +136,7 @@ class MuscleAdiposeTissuePostProcessing(InferenceClass):
         cats = list(categories.keys())
 
         file_idx = 0
-        for mask, image in tqdm(zip(masks, images), total=len(masks)):
+        for mask, image in zip(masks, images):
             muscle_mask = mask[..., cats.index("muscle")]
             imat_mask = mask[..., cats.index("imat")]
             imat_mask = (
@@ -293,6 +292,8 @@ class MuscleAdiposeTissueMetricsSaver(InferenceClass):
         """Save metrics to a CSV file."""
         self.model_type = inference_pipeline.muscle_adipose_tissue_model_type
         self.model_name = inference_pipeline.muscle_adipose_tissue_model_name
+        self.dicom_series_name = inference_pipeline.dicom_series_name
+        self.dicom_series_date = inference_pipeline.dicom_series_date
         self.output_dir = inference_pipeline.output_dir
         self.csv_output_dir = os.path.join(self.output_dir, "metrics")
         os.makedirs(self.csv_output_dir, exist_ok=True)
@@ -307,21 +308,25 @@ class MuscleAdiposeTissueMetricsSaver(InferenceClass):
         cats = list(categories.keys())
         df = pd.DataFrame(
             columns=[
-                "File Name",
-                "File Path",
-                "Muscle HU",
-                "Muscle CSA (cm^2)",
-                "IMAT HU",
-                "IMAT CSA (cm^2)",
-                "SAT HU",
-                "SAT CSA (cm^2)",
-                "VAT HU",
-                "VAT CSA (cm^2)",
+                "series_name",
+                "series_date",
+                "slice_label",
+                "slice_path",
+                "muscle_hu",
+                "muscle_csa",
+                "imat_hu",
+                "imat_csa",
+                "sat_hu",
+                "sat_csa",
+                "vat_hu",
+                "vat_csa",
             ]
         )
 
         for i, result in enumerate(results):
             row = []
+            row.append(self.dicom_series_name)
+            row.append(self.dicom_series_date)
             row.append(self.dicom_file_names[i])
             row.append(self.dicom_file_paths[i])
             for cat in cats:

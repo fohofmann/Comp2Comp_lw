@@ -114,7 +114,7 @@ class Models(enum.Enum):
             print("")
 
         print("Loading muscle/fat model from {}".format(filename))
-        return load_model(filename)
+        return load_model(filename, compile=False)
 
     @staticmethod
     def model_from_name(model_name):

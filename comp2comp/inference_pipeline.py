@@ -16,10 +16,10 @@ class InferencePipeline(InferenceClass):
 
     def __call__(self, inference_pipeline=None, **kwargs):
         # print out the class names for each inference class
-        print("Planned inference pipeline:")
-        for i, inference_class in enumerate(self.inference_classes):
-            print(f"({i + 1}) {inference_class.__repr__()}")
-        print("")
+        #print("Planned inference pipeline:")
+        #for i, inference_class in enumerate(self.inference_classes):
+        #    print(f"({i + 1}) {inference_class.__repr__()}")
+        #print("")
 
         print("Starting inference pipeline.\n")
 
@@ -52,7 +52,7 @@ class InferencePipeline(InferenceClass):
             else:
                 output = inference_class(inference_pipeline=self, **output)
 
-            print("Finished {}".format(inference_class.__repr__()))
+            # print("Finished {}".format(inference_class.__repr__()))
 
         print("Inference pipeline finished.\n")
 
